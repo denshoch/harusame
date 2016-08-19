@@ -1,13 +1,14 @@
 {
     "name": "denshoch/harusame",
     "type": "library",
-    "homepage": "http://conv.denshochan.com/",
+    "description": "Add special HTML classes for Tate-Chu-Yoko and text-orientaion.",
+    "homepage": "http://denshochan.com/",
     "version": "1.0.0",
     "license": "MIT",
     "authors": [
         {
             "name": "Densho Channel",
-            "homepage": "http://densho.hatenablog.com/",
+            "homepage": "http://denshochan.com/",
             "role": "Developer"
         }
     ],
