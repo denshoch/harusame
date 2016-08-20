@@ -3,7 +3,7 @@ Harusame
 
 Wrap sequence of numbers(default is two-digit) and sequence of EXCLAMATION (QUESTION) MARKs with `span.tcy` in (see [Tate-Chu-Yoko](https://www.w3.org/TR/jlreq/#handling_of_tatechuyoko)).
 
-Wrap each characters of upright glyph orientation with `span.upright` and sideways glyph orientation with `span.sideways`(see [URT50](http://www.unicode.org/reports/tr50/)).
+Wrap each characters of upright glyph orientation with `span.upright` and sideways glyph orientation with `span.sideways`(see [UTR50](http://www.unicode.org/reports/tr50/)).
 
 Expected CSS;
 
