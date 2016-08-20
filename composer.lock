@@ -4,51 +4,45 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "efff866ab144f4e7a491d1d0c97fdc33",
-    "content-hash": "5de4da51f767fc07294a9e21f9390083",
+    "hash": "91fcc349f0683ba7475b233d3974cb11",
+    "content-hash": "4237af7624bb1c3acd0e083493402c14",
     "packages": [
         {
-            "name": "shark/simple_html_dom",
-            "version": "dev-master",
+            "name": "emanueleminotto/simple-html-dom",
+            "version": "1.5",
             "source": {
                 "type": "git",
-                "url": "https://github.com/samacs/simple_html_dom.git",
-                "reference": "842b3fc1f9f0c70b8c1b2e93fc451834c42e384d"
+                "url": "https://github.com/EmanueleMinotto/simple-html-dom.git",
+                "reference": "09b7f3ad5b62d1cc3dfc2d326845e73d2cdc2819"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/samacs/simple_html_dom/zipball/842b3fc1f9f0c70b8c1b2e93fc451834c42e384d",
-                "reference": "842b3fc1f9f0c70b8c1b2e93fc451834c42e384d",
+                "url": "https://api.github.com/repos/EmanueleMinotto/simple-html-dom/zipball/09b7f3ad5b62d1cc3dfc2d326845e73d2cdc2819",
+                "reference": "09b7f3ad5b62d1cc3dfc2d326845e73d2cdc2819",
                 "shasum": ""
-            },
-            "require": {
-                "ext-mbstring": "*",
-                "php": ">=5.2.4"
             },
             "type": "library",
             "autoload": {
-                "classmap": [
-                    "simple_html_dom.php"
-                ],
                 "files": [
                     "simple_html_dom.php"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
             "authors": [
                 {
                     "name": "S.C. Chen",
-                    "email": "me578022@gmail.com",
-                    "homepage": "http://simplehtmldom.sourceforge.net/"
+                    "email": "me578022@gmail.com"
+                },
+                {
+                    "name": "Emanuele Minotto",
+                    "email": "minottoemanuele@gmail.com"
                 }
             ],
-            "description": "Simple HTML DOM package.",
-            "homepage": "http://simplehtmldom.sourceforge.net/",
-            "keywords": [
-                "dom",
-                "php dom"
-            ],
-            "time": "2014-10-17 00:16:28"
+            "description": "PHP Simple HTML DOM Parser",
+            "time": "2015-08-31 00:31:29"
         }
     ],
     "packages-dev": [
@@ -1157,18 +1151,9 @@
             "time": "2016-08-09 15:02:57"
         }
     ],
-    "aliases": [
-        {
-            "alias": "1.5",
-            "alias_normalized": "1.5.0.0",
-            "version": "9999999-dev",
-            "package": "shark/simple_html_dom"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "shark/simple_html_dom": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
