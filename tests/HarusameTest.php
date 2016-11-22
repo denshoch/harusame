@@ -101,6 +101,30 @@ class HarusameTest extends PHPUnit_Framework_TestCase
         $this->is_same($source, $excpected);
     }
 
+    public function testURL()
+    {
+        // パーセントエンコーディングの中の数字がtcyにならないこと
+        $source = '<a href="https://ja.wikipedia.org/wiki/%E9%9B%BB%E5%AD%90%E6%9B%B8%E7%B1%8D">https://ja.wikipedia.org/wiki/%E9%9B%BB%E5%AD%90%E6%9B%B8%E7%B1%8D</a>';
+        $excpected = $source;
+        $this->is_same($source, $excpected);
+    }
+
+    public function testMail()
+    {
+        //メールアドレスの中の数字がtcyにならないこと
+        $source = "連絡先はinfo@example21.comです。";
+        $excpected = $source;
+        $this->is_same($source, $excpected);
+    }
+
+    public function testCharRef()
+    {
+        // 文字参照の中の数字がtcyにならないこと
+        $source = '<a href="&#109;a&#x69;&#108;&#x74;&#111;&#x3a;&#105;&#x6e;&#102;&#x6f;&#64;&#x65;&#120;&#x61;&#109;p&#108;e&#x2e;&#99;&#x6f;&#109;">&#105;&#x6e;&#102;&#x6f;&#64;&#x65;&#120;&#x61;&#109;p&#108;e&#x2e;&#99;&#x6f;&#109;</a>';
+        $excpected = $source;
+        $this->is_same($source, $excpected);
+    }
+
     private function is_same($source, $excpected)
     {
         $actual = $this->harusame->transform($source);
