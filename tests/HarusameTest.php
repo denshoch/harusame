@@ -42,6 +42,13 @@ class HarusameTest extends PHPUnit_Framework_TestCase
         $this->is_same($source, $excpected);
     }
 
+    public function testTcyFullwidth()
+    {
+        $source =    '１２ああああ３４ああ４５７あああ８９';
+        $excpected = '１２ああああ３４ああ４５７あああ８９';
+        $this->is_same($source, $excpected);
+    }
+
     public function testTcyFalse()
     {
     	$this->harusame->autoTcy = false;
