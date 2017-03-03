@@ -83,7 +83,7 @@ class Harusame
     	$emoReg = "/(^|[^!?])([!?]{2})(?![!?])/u";
     	$text = preg_replace($emoReg, '\1<span class="tcy">\2</span>', $text);
 
-    	$digitReg = "/(^|[^\d])(\d{2," . $this->tcyDigit . "})(?!\d)/u";
+    	$digitReg = "/(^|[^0-9])([0-9]{2," . $this->tcyDigit . "})(?![0-9])/u";
         $text = preg_replace($digitReg, '\1<span class="tcy">\2</span>', $text);
     	return $text;
     }
