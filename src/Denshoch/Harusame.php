@@ -53,7 +53,7 @@ class Harusame
     */
     public function transform($text)
     {
-        $dom = \str_get_html($text, false, true, DEFAULT_TARGET_CHARSET, false, DEFAULT_BR_TEXT,DEFAULT_SPAN_TEXT);
+        $dom = \Sunra\PhpSimple\HtmlDomParser::str_get_html($text, false, true, DEFAULT_TARGET_CHARSET, false, DEFAULT_BR_TEXT,DEFAULT_SPAN_TEXT);
 
         if( is_null( $dom->find("body", 0) ) ) {
             // non HTML
