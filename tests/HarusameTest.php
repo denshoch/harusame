@@ -2,12 +2,13 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
+use Denshoch\Harusame;
 
 class HarusameTest extends TestCase
 {
-    public function setUp()
+    public function setUp():void
     {
-        $this->harusame = new Denshoch\Harusame;
+        $this->harusame = new Harusame();
     }
 
     public function testTcy2()
@@ -34,14 +35,14 @@ class HarusameTest extends TestCase
 
     public function testTcy3()
     {
-    	$this->harusame->tcyDigit = 3;
+        $harusame = new Harusame(["tcyDigit" => 3]);
         $source =    '12ああああ34ああ457あああ89';
         $excpected = '<span class="tcy">12</span>ああああ<span class="tcy">34</span>ああ<span class="tcy">457</span>あああ<span class="tcy">89</span>';
-        $this->is_same($source, $excpected);
+        $this->is_same($source, $excpected, $harusame);
 
         $source =    '!!ああああ!!!ああ!?あああ??';
         $excpected = '<span class="tcy">!!</span>ああああ!!!ああ<span class="tcy">!?</span>あああ<span class="tcy">??</span>';
-        $this->is_same($source, $excpected);
+        $this->is_same($source, $excpected, $harusame);
     }
 
     public function testTcyFullwidth()
@@ -53,14 +54,14 @@ class HarusameTest extends TestCase
 
     public function testTcyFalse()
     {
-    	$this->harusame->autoTcy = false;
+        $harusame = new Harusame(["autoTcy" => false]);
         $source =    '12ああああ34ああ457あああ89';
         $excpected = $source;
-        $this->is_same($source, $excpected);
+        $this->is_same($source, $excpected, $harusame);
 
         $source =    '!!ああああ!!!ああ!?あああ??';
         $excpected = $source;
-        $this->is_same($source, $excpected);
+        $this->is_same($source, $excpected, $harusame);
     }
 
     public function testOrientation()
@@ -87,26 +88,28 @@ class HarusameTest extends TestCase
 
     public function testOrientationFalse()
     {
-        $this->harusame->autoTextOrientation = false;
+        $harusame = new Harusame(["autoTextOrientation" => false]);
 
         $source =   '÷∴≠≦≧∧∨＜＞‐－';
         $excpected = $source;
-        $this->is_same($source, $excpected);
+        $this->is_same($source, $excpected, $harusame);
 
         $source = 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρςστυφχψωАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя¨ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩⅪⅰⅱⅲⅳⅴⅵⅶⅷⅸⅹⅺⅻ♀♂∀∃∠⊥⌒∂∇√∽∝∫∬∞①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳㉑㉒㉓㉔㉕㉖㉗㉘㉙㉚㉛㉜㉝㉞㉟㊱㊲㊳㊴㊵㊶㊷㊸㊹㊺㊻㊼㊽㊾㊿❶❷❸❹❺❻❼❽❾❿⓫⓬⓭⓮⓯⓰⓱⓲⓳⓴⓵⓶⓷⓸⓹⓺⓻⓼⓽⓾▱▲△▼▽☀☁☂☃★☆☎☖☗♠♡♢♣♤♥♦♧♨♩♪♫♬♭♮♯✓〒〠¶†‡‼⁇⁈⁉№℡㏍＃＄％＆＊＠￥¢£§°‰′″℃㎎㎏㎝㎞㎡㏄Å〳〴〵〻〼ゟヿ⅓⅔⅕⇒⇔';
         $excpected = $source;
-        $this->is_same($source, $excpected);
+        $this->is_same($source, $excpected, $harusame);
     }
 
-
+    /**
+     * @group aaa
+     */
     public function testHTML()
     {
-        $source =    '<html><head><title>12ああああ34ああ457あああ89</title><body>12ああああ34ああ457あああ89</body></html>';
-        $excpected = '<html><head><title>12ああああ34ああ457あああ89</title><body><span class="tcy">12</span>ああああ<span class="tcy">34</span>ああ457あああ<span class="tcy">89</span></body></html>';
+        $source =    '<html><head><title>12ああああ34ああ457あああ89</title></head><body>12ああああ34ああ457あああ89</body></html>';
+        $excpected = '<html><head><title>12ああああ34ああ457あああ89</title></head><body><span class="tcy">12</span>ああああ<span class="tcy">34</span>ああ457あああ<span class="tcy">89</span></body></html>';
         $this->is_same($source, $excpected);
 
-        $source =   '<html><head><title>÷∴≠≦≧∧∨＜＞‐－</title><body>÷∴≠≦≧∧∨＜＞‐－</body></html>';
-        $excpected = '<html><head><title>÷∴≠≦≧∧∨＜＞‐－</title><body><span class="sideways">÷</span><span class="sideways">∴</span><span class="sideways">≠</span><span class="sideways">≦</span><span class="sideways">≧</span><span class="sideways">∧</span><span class="sideways">∨</span><span class="sideways">＜</span><span class="sideways">＞</span><span class="sideways">‐</span><span class="sideways">－</span></body></html>';
+        $source =   '<html><head><title>÷∴≠≦≧∧∨＜＞‐－</title></head><body>÷∴≠≦≧∧∨＜＞‐－</body></html>';
+        $excpected = '<html><head><title>÷∴≠≦≧∧∨＜＞‐－</title></head><body><span class="sideways">÷</span><span class="sideways">∴</span><span class="sideways">≠</span><span class="sideways">≦</span><span class="sideways">≧</span><span class="sideways">∧</span><span class="sideways">∨</span><span class="sideways">＜</span><span class="sideways">＞</span><span class="sideways">‐</span><span class="sideways">－</span></body></html>';
         $this->is_same($source, $excpected);
     }
 
@@ -130,13 +133,17 @@ class HarusameTest extends TestCase
     {
         // 文字参照の中の数字がtcyにならないこと
         $source = '<a href="&#109;a&#x69;&#108;&#x74;&#111;&#x3a;&#105;&#x6e;&#102;&#x6f;&#64;&#x65;&#120;&#x61;&#109;p&#108;e&#x2e;&#99;&#x6f;&#109;">&#105;&#x6e;&#102;&#x6f;&#64;&#x65;&#120;&#x61;&#109;p&#108;e&#x2e;&#99;&#x6f;&#109;</a>';
-        $excpected = $source;
+        $excpected = '<a href="mailto:info@example.com">info@example.com</a>';
         $this->is_same($source, $excpected);
     }
 
-    private function is_same($source, $excpected)
+    private function is_same($source, $excpected, $harusame=null)
     {
-        $actual = $this->harusame->transform($source);
+        if ($harusame) {
+            $actual = $harusame->transform($source);
+        } else {
+            $actual = $this->harusame->transform($source);
+        }
         $this->assertSame($excpected, $actual);
     }
 }

@@ -1,26 +1,26 @@
 <?php
 namespace Denshoch;
 
+use DOMDocument;
+use DOMXpath;
+
 class Harusame
 {
-	public $autoTcy;
-	public $tcyDigit;
-	public $autoTextOrientation;
+	protected static $autoTcy = true;
+	protected static $tcyDigit = 2;
+    protected static $autoTextOrientation = true;
 
-	public function __construct(array $options = null)
-	{
-		$this->autoTcy = true;
-		$this->tcyDigit = 2;
-		$this->autoTextOrientation = true;
-        $this->text = "";
-
-        $is_text = false;
+    public function __construct(array $options=null)
+    {
+        self::$autoTcy = true;
+        self::$tcyDigit = 2;
+        self::$autoTextOrientation = true;
 
 		if (false === is_null($options)){
 
 		    if(array_key_exists("autoTcy", $options)){
 		  	    if (is_bool($options["autoTcy"])) {
-		  		    $this->autoTcy = $options["autoTcy"];
+		  		    self::$autoTcy = $options["autoTcy"];
 		  	    } else {
 		  		    trigger_error("autoTcy should be boolean.");
 		  	    }
@@ -31,7 +31,7 @@ class Harusame
 		  	    	if ($options["tcyDigit"] < 2) {
                         trigger_error("tcyDigit should be 2 or greater.", E_USER_ERROR);
 		  	    	} else {
-		  	    		$this->tcyDigit = $options["tcyDigit"];
+		  	    		self::$tcyDigit = $options["tcyDigit"];
 		  	    	}
 		  	    } else {
 		  		    trigger_error("tcyDigit should be int.");
@@ -40,40 +40,101 @@ class Harusame
 
 		    if(array_key_exists("autoTextOrientation", $options)){
 		  	    if (is_bool($options["autoTextOrientation"])) {
-		  		    $this->autoTextOrientation = $options["autoTextOrientation"];
+		  		    self::$autoTextOrientation = $options["autoTextOrientation"];
 		  	    } else {
 		  		    trigger_error("autoTextOrientation should be boolean.");
 		  	    }
 		    }
 		}
-	}
+    }
 
-    /*
-    * @param string $text string or html string
-    */
-    public function transform($text)
+    /**
+     * transform text
+     * 
+     * @param string $text Input text to transform.
+     * @return string transformed text.
+     */
+    public static function transform(string $text):string
     {
-        $dom = \Sunra\PhpSimple\HtmlDomParser::str_get_html($text, false, true, DEFAULT_TARGET_CHARSET, false, DEFAULT_BR_TEXT,DEFAULT_SPAN_TEXT);
+        $dom = new DOMDocument('1.0', 'utf-8');
+        $dom->formatOutput = false;
+        $text = mb_convert_encoding($text, 'HTML-ENTITIES', 'UTF-8');
 
-        if( is_null( $dom->find("body", 0) ) ) {
-            // non HTML
-            $textNodes = $dom->find("text");
-        } else {
-        	// HTML
-            $textNodes = $dom->find("body", 0)->find("text");
+        @$dom->loadHTML($text, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+        $isHtml = ($dom->firstChild->tagName === 'html');
+
+        if (!$isHtml) {
+            $text = "<harusame>$text</harusame>";
+            @$dom->loadHTML($text, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         }
 
-        foreach ($textNodes as $t) {
-        	$parentClasses = preg_split('/ /', $t->parent()->class); // 親要素のクラス名を配列で取得
-            if(false === in_array('tcy', $parentClasses) && false === in_array('upright', $parentClasses) && false === in_array('sideways', $parentClasses) ) {
-            	$t->innertext = $this->filter($t->innertext); 	
+        $xpath = new DOMXpath($dom);
+        if ($isHtml) {
+            $nodes = $xpath->query("//body//text()");
+        } else {
+            $nodes = $xpath->query("//text()");
+        }
+        
+
+        foreach($nodes as $node) {
+            if (self::checkParentNode($node)) continue;
+
+            $str = self::filter($node->textContent);
+            $str = mb_convert_encoding($str, 'HTML-ENTITIES', 'UTF-8');
+
+            $tmpDom = new DOMDocument('1.0', 'utf-8');
+            $tmpDom->formatOutput = false;
+            $fragment = $node->ownerDocument->createDocumentFragment();
+            
+            @$tmpDom->loadHTML("<harusame>$str</harusame>", LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+            foreach($tmpDom->firstChild->childNodes as $child){
+                $child = $dom->importNode($child, true);
+                $fragment->appendChild($child);
+            }
+            unset($tmpDom);
+            $node->parentNode->replaceChild($fragment, $node);
+        }
+
+        if ($isHtml) {
+            return rtrim(mb_convert_encoding($dom->saveHTML(), 'UTF-8', 'HTML-ENTITIES'), "\n");
+        }
+        return self::innerHTML($dom->firstChild);
+    }
+
+    public static function checkParentNode(\DOMNode &$node):bool
+    {
+        if (is_null($node->parentNode)) return false;
+
+        if ($node->nodeType === 1)
+        {
+            if(!empty($classStr = $node->getAttribute('class')))
+            {
+                $arr = preg_split('/\s/', $classStr);
+                if (
+                    in_array('tcy', $arr) || 
+                    in_array('upright', $arr) || 
+                    in_array('sideways', $arr) 
+                ) {
+                    return true;
+                }
             }
         }
 
-        return $dom->save();
+        return self::checkParentNode($node->parentNode);
     }
 
-    private function filter($text)
+    protected static function innerHTML(\DOMNode $node):string
+    {
+        $str = "";
+        foreach($node->childNodes as $child)
+        {
+            $str .= $node->ownerDocument->saveHTML($child);
+        }
+        return $str;
+    }
+
+    private static function filter(string $text):string
     {
         // URLの正規表現断片 http://qiita.com/mpyw/items/1e422848030fcde0f29a
         $urlRegFlagment = 'https?+:(?://(?:(?:[-.0-9_a-z~]|%[0-9a-f][0-9a-f]' .
@@ -141,11 +202,11 @@ class Harusame
         $return_text = "";
         foreach ($text_array as $text_array_item) {
             if ( preg_match($fileterReg, $text_array_item) == false ) {
-                if(true === $this->autoTcy) {
-                    $text_array_item = $this->setTcy($text_array_item); 
+                if(true === self::$autoTcy) {
+                    $text_array_item = self::setTcy($text_array_item); 
                 }
-                if(true === $this->autoTextOrientation) {
-                    $text_array_item = $this->setTextOrientation($text_array_item); 
+                if(true === self::$autoTextOrientation) {
+                    $text_array_item = self::setTextOrientation($text_array_item); 
                 }
             }
             $return_text .= $text_array_item;
@@ -154,17 +215,17 @@ class Harusame
         return $return_text;
     }
 
-    private function setTcy($text)
+    private static function setTcy(string $text):string
     {
     	$emoReg = "/(^|[^!?])([!?]{2})(?![!?])/u";
     	$text = preg_replace($emoReg, '\1<span class="tcy">\2</span>', $text);
 
-    	$digitReg = "/(^|[^0-9])([0-9]{2," . $this->tcyDigit . "})(?![0-9])/u";
+    	$digitReg = "/(^|[^0-9])([0-9]{2," . self::$tcyDigit . "})(?![0-9])/u";
         $text = preg_replace($digitReg, '\1<span class="tcy">\2</span>', $text);
     	return $text;
     }
 
-    private function setTextOrientation($text)
+    private static function setTextOrientation(string $text):string
     {
         //　横転処理
         $sidewaysReg = "/(÷|&#xf7;|&#247;|∴|&#x2234;|&#8756;|≠|&#x2260;|&#8800;|≦|&#x2266;|&#8806;|≧|&#x2267;|&#8807;|∧|&#x2227;|&#8743;|∨|&#x2228;|&#8744;|＜|&#xff1c;|&#65308;|＞|&#xff1e;|&#65310;|‐|&#x2010;|&#8208;|－|&#xff0d;|&#65293;)/u";
