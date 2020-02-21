@@ -76,7 +76,6 @@ class Harusame
             $nodes = $xpath->query("//text()");
         }
         
-
         foreach($nodes as $node) {
             if (self::checkParentNode($node)) continue;
 
@@ -102,19 +101,30 @@ class Harusame
         return self::innerHTML($dom->firstChild);
     }
 
+    /**
+     * checkParentNode
+     * 
+     * @param DOMNode $node
+     * @return boolean
+     */
     public static function checkParentNode(\DOMNode &$node):bool
     {
-        if (is_null($node->parentNode)) return false;
+        // === null is faster then is_null()
+        if ($node->parentNode === null) return false;
 
         if ($node->nodeType === 1)
         {
             if(!empty($classStr = $node->getAttribute('class')))
             {
-                $arr = preg_split('/\s/', $classStr);
+                $arr = [];
+                foreach(preg_split('/\s/', $classStr) as $class) {
+                    $arr[$class] = true;
+                }
+                // isset() is faster than in_array()
                 if (
-                    in_array('tcy', $arr) || 
-                    in_array('upright', $arr) || 
-                    in_array('sideways', $arr) 
+                    isset($arr['tcy']) || 
+                    isset($arr['upright']) || 
+                    isset($arr['sideways'])
                 ) {
                     return true;
                 }
@@ -124,6 +134,12 @@ class Harusame
         return self::checkParentNode($node->parentNode);
     }
 
+    /**
+     * innerHTML
+     * 
+     * @param DOMNode $node
+     * @return string Inner HTML.
+     */
     protected static function innerHTML(\DOMNode $node):string
     {
         $str = "";
@@ -134,6 +150,12 @@ class Harusame
         return $str;
     }
 
+    /**
+     * filter
+     * 
+     * @param string $text
+     * @return string Transformed text.
+     */
     private static function filter(string $text):string
     {
         // URLの正規表現断片 http://qiita.com/mpyw/items/1e422848030fcde0f29a
@@ -215,6 +237,12 @@ class Harusame
         return $return_text;
     }
 
+    /**
+     * setTcy
+     * 
+     * @param string $text
+     * @return string Transformted text.
+     */
     private static function setTcy(string $text):string
     {
     	$emoReg = "/(^|[^!?])([!?]{2})(?![!?])/u";
@@ -225,6 +253,12 @@ class Harusame
     	return $text;
     }
 
+    /**
+     * setTextOrientation
+     * 
+     * @param string $text
+     * @return string Transformted text.
+     */
     private static function setTextOrientation(string $text):string
     {
         //　横転処理
