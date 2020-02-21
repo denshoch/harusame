@@ -16,7 +16,8 @@ class Harusame
         self::$tcyDigit = 2;
         self::$autoTextOrientation = true;
 
-		if (false === is_null($options)){
+        // !== null is faster than is_null()
+		if ($options !== null){
 
 		    if(array_key_exists("autoTcy", $options)){
 		  	    if (is_bool($options["autoTcy"])) {
