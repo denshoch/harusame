@@ -79,6 +79,7 @@ class Harusame
         
         foreach($nodes as $node) {
             if (self::checkParentNode($node)) continue;
+            if (preg_match('/\s+/', $node->nodeValue)) continue;
 
             $str = self::filter($node->textContent);
             $str = mb_convert_encoding($str, 'HTML-ENTITIES', 'UTF-8');
