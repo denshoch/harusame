@@ -58,22 +58,16 @@ class Harusame
     public static function transform(string $text):string
     {
         $dom = new DOMDocument('1.0', 'utf-8');
-        $dom->formatOutput = false;
-        $text = mb_convert_encoding($text, 'HTML-ENTITIES', 'UTF-8');
-
-        @$dom->loadHTML($text, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-
-        $isHtml = ($dom->firstChild->tagName === 'html');
-
-        if (!$isHtml) {
-            $text = "<harusame>$text</harusame>";
-            @$dom->loadHTML($text, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-        }
+        //$dom->recover = true;
+        //$text = html_entity_decode($text,ENT_NOQUOTES | ENT_XML1);
+        //$text = mb_convert_encoding($text, 'HTML-ENTITIES', 'UTF-8');
+        @$dom->loadXML("<harusame>$text</harusame>");
 
         $xpath = new DOMXpath($dom);
-        if ($isHtml) {
-            $nodes = $xpath->query("//body//text()");
-        } else {
+        $nodes = $xpath->query("//body//text()");
+
+        if ($nodes->length === 0)
+        {
             $nodes = $xpath->query("//text()");
         }
         
@@ -97,10 +91,7 @@ class Harusame
             $node->parentNode->replaceChild($fragment, $node);
         }
 
-        if ($isHtml) {
-            return rtrim(mb_convert_encoding($dom->saveHTML(), 'UTF-8', 'HTML-ENTITIES'), "\n");
-        }
-        return self::innerHTML($dom->firstChild);
+        return self::innerXML($dom->firstChild);
     }
 
     /**
@@ -137,17 +128,19 @@ class Harusame
     }
 
     /**
-     * innerHTML
+     * innerXML
      * 
      * @param DOMNode $node
-     * @return string Inner HTML.
+     * @return string Inner XML.
      */
-    protected static function innerHTML(\DOMNode $node):string
+    protected static function innerXML(\DOMNode $node):string
     {
         $str = "";
         foreach($node->childNodes as $child)
         {
-            $str .= $node->ownerDocument->saveHTML($child);
+            $str .= self::trimXMLDecl(
+                $node->ownerDocument->saveXML($child)
+            );
         }
         return $str;
     }
@@ -274,5 +267,15 @@ class Harusame
         $text = preg_replace($uprightReg, '<span class="upright">\1</span>', $text);
 
         return $text;
+    }
+
+    /**
+     * Remove XML declaration
+     * @param string $str Input text.
+     * @return string Transformed text.
+     */
+    protected static function trimXMLDecl(string $str):string
+    {
+        return preg_replace("/^<\?xml version=\".+?>\n/",'',$str);
     }
 }

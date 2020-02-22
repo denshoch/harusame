@@ -136,56 +136,6 @@ class HarusameTest extends TestCase
         $this->is_same($source, $excpected);
     }
 
-    /**
-     * @group t1
-     */
-    public function testMdFootnoteExmple()
-    {
-        $source = <<< EOT
-<div>
-<ol>
-<li>
-text
-</li>
-
-</ol>
-</div>
-EOT;
-        $dom = new DOMDocument;
-        $dom->loadHTML($source, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-        
-        $xpath = new DOMXpath($dom);
-        $nodes = $xpath->query("//text()");
-
-        foreach($nodes as $node) {
-            var_dump($node->nodeValue);
-            if (preg_match('/\s+/', $node->nodeValue))
-            {
-                continue;
-            }
-            $tmpDom = new DOMDocument('1.0', 'utf-8');
-            $tmpDom->preserveWhiteSpace = true;
-            $tmpDom->formatOutput = true;
-            $fragment = $node->ownerDocument->createDocumentFragment();
-            @$tmpDom->loadHTML("<harusame>$node->nodeValue</harusame>", LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-            echo $tmpDom->firstChild->tagName;
-            foreach($tmpDom->firstChild->childNodes as $child){
-                var_dump($child);
-                $child = $dom->importNode($child, true);
-                $fragment->appendChild($child);
-            }
-            unset($tmpDom);
-            $node->parentNode->replaceChild($fragment, $node);
-        }
-        $dom->preserveWhiteSpace = true;
-        $dom->formatOutput = true;
-        echo $dom->saveHTML();
-
-        $excpected = $source;
-        $this->is_same($source, $excpected);
-        $this->assertTrue(true);
-    }
-
     private function is_same($source, $excpected, $harusame=null)
     {
         if ($harusame) {
