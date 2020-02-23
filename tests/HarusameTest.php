@@ -105,11 +105,11 @@ class HarusameTest extends TestCase
     {
         $source =    '<html><head><title>12ああああ34ああ457あああ89</title></head><body>12ああああ34ああ457あああ89</body></html>';
         $excpected = '<html><head><title>12ああああ34ああ457あああ89</title></head><body><span class="tcy">12</span>ああああ<span class="tcy">34</span>ああ457あああ<span class="tcy">89</span></body></html>';
-        $this->is_same($source, $excpected);
+        $this->is_sameXML($source, $excpected);
 
         $source =   '<html><head><title>÷∴≠≦≧∧∨＜＞‐－</title></head><body>÷∴≠≦≧∧∨＜＞‐－</body></html>';
         $excpected = '<html><head><title>÷∴≠≦≧∧∨＜＞‐－</title></head><body><span class="sideways">÷</span><span class="sideways">∴</span><span class="sideways">≠</span><span class="sideways">≦</span><span class="sideways">≧</span><span class="sideways">∧</span><span class="sideways">∨</span><span class="sideways">＜</span><span class="sideways">＞</span><span class="sideways">‐</span><span class="sideways">－</span></body></html>';
-        $this->is_same($source, $excpected);
+        $this->is_sameXML($source, $excpected);
     }
 
     public function testURL()
@@ -144,5 +144,15 @@ class HarusameTest extends TestCase
             $actual = $this->harusame->transform($source);
         }
         $this->assertSame($excpected, $actual);
+    }
+
+    private function is_sameXML($source, $excpected, $harusame=null)
+    {
+        if ($harusame) {
+            $actual = $harusame->transform($source);
+        } else {
+            $actual = $this->harusame->transform($source);
+        }
+        $this->assertXmlStringEqualsXmlString($excpected, $actual);
     }
 }

@@ -58,10 +58,11 @@ class Harusame
     public static function transform(string $text):string
     {
         $dom = new DOMDocument('1.0', 'utf-8');
-        //$dom->recover = true;
-        //$text = html_entity_decode($text,ENT_NOQUOTES | ENT_XML1);
-        //$text = mb_convert_encoding($text, 'HTML-ENTITIES', 'UTF-8');
-        @$dom->loadXML("<harusame>$text</harusame>");
+        @$dom->loadHTML("<?xml encoding=\"UTF-8\"><html/>");
+        $fragment = $dom->createDocumentFragment();
+        $fragment->appendXML($text);
+        $dom->documentElement->appendChild($fragment);
+        unset($fragment);
 
         $xpath = new DOMXpath($dom);
         $nodes = $xpath->query("//body//text()");
@@ -76,22 +77,21 @@ class Harusame
             if (preg_match('/\s+/', $node->nodeValue)) continue;
 
             $str = self::filter($node->textContent);
-            $str = mb_convert_encoding($str, 'HTML-ENTITIES', 'UTF-8');
+            $fragment = $dom->createDocumentFragment();
 
-            $tmpDom = new DOMDocument('1.0', 'utf-8');
-            $tmpDom->formatOutput = false;
-            $fragment = $node->ownerDocument->createDocumentFragment();
-            
-            @$tmpDom->loadHTML("<harusame>$str</harusame>", LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-            foreach($tmpDom->firstChild->childNodes as $child){
-                $child = $dom->importNode($child, true);
-                $fragment->appendChild($child);
-            }
-            unset($tmpDom);
+            $fragment->appendXML($str);
             $node->parentNode->replaceChild($fragment, $node);
+            unset($fragment);
         }
 
-        return self::innerXML($dom->firstChild);
+        return 
+            rtrim(
+                preg_replace(
+                    '/^<html>\n?|<\/html>$/',
+                    '',
+                    $dom->saveXML($dom->documentElement)
+                )
+            );
     }
 
     /**
@@ -125,24 +125,6 @@ class Harusame
         }
 
         return self::checkParentNode($node->parentNode);
-    }
-
-    /**
-     * innerXML
-     * 
-     * @param DOMNode $node
-     * @return string Inner XML.
-     */
-    protected static function innerXML(\DOMNode $node):string
-    {
-        $str = "";
-        foreach($node->childNodes as $child)
-        {
-            $str .= self::trimXMLDecl(
-                $node->ownerDocument->saveXML($child)
-            );
-        }
-        return $str;
     }
 
     /**
@@ -267,15 +249,5 @@ class Harusame
         $text = preg_replace($uprightReg, '<span class="upright">\1</span>', $text);
 
         return $text;
-    }
-
-    /**
-     * Remove XML declaration
-     * @param string $str Input text.
-     * @return string Transformed text.
-     */
-    protected static function trimXMLDecl(string $str):string
-    {
-        return preg_replace("/^<\?xml version=\".+?>\n/",'',$str);
     }
 }
