@@ -9,6 +9,102 @@ class Harusame
 	protected static $autoTcy = true;
 	protected static $tcyDigit = 2;
     protected static $autoTextOrientation = true;
+    protected static $notEmptyTags = [
+        "article",
+        "section",
+        "nav",
+        "aside",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "hgroup",
+        "header",
+        "footer",
+        "address",
+        "p",
+        "pre",
+        "blockquote",
+        "ol",
+        "ul",
+        "li",
+        "dl",
+        "dt",
+        "dd",
+        "figure",
+        "figcaption",
+        "main",
+        "div",
+        "a",
+        "em",
+        "strong",
+        "small",
+        "s",
+        "cite",
+        "q",
+        "dfn",
+        "abbr",
+        "code",
+        "var",
+        "samp",
+        "kbd",
+        "data",
+        "sub",
+        "sup",
+        "time",
+        "i",
+        "b",
+        "u",
+        "mark",
+        "ruby",
+        "rb",
+        "rt",
+        "rtc",
+        "rp",
+        "bdi",
+        "bdo",
+        "span",
+        "ins",
+        "del",
+        "picture",
+        "iframe",
+        "object",
+        "video",
+        "audio",
+        "map",
+        "table",
+        "caption",
+        "colgroup",
+        "tbody",
+        "thead",
+        "tfoot",
+        "tr",
+        "td",
+        "th",
+        "form",
+        "fieldset",
+        "legend",
+        "label",
+        "select",
+        "option",
+        "optgroup",
+        "textarea",
+        "button",
+        "datalist",
+        "output",
+        "progress",
+        "meter",
+        "script",
+        "noscript",
+        "template",
+        "canvas",
+        "details",
+        "summary",
+        "menu",
+        "menuitem"
+    ];
 
     public function __construct(array $options=null)
     {
@@ -65,12 +161,10 @@ class Harusame
         unset($fragment);
 
         $xpath = new DOMXpath($dom);
+
         $nodes = $xpath->query("//body//text()");
 
-        if ($nodes->length === 0)
-        {
-            $nodes = $xpath->query("//text()");
-        }
+        if ($nodes->length === 0) $nodes = $xpath->query("//text()");
         
         foreach($nodes as $node) {
             if (self::checkParentNode($node)) continue;
@@ -82,6 +176,20 @@ class Harusame
             $fragment->appendXML($str);
             $node->parentNode->replaceChild($fragment, $node);
             unset($fragment);
+        }
+
+        /** disaallowed empty tags */
+        $query = "";
+        foreach(self::$notEmptyTags as $idx => $tag)
+        {
+            if ($idx !== 0) $query .= " | ";
+
+            $query .= "//$tag";
+        }
+        $nodes = $xpath->query($query);
+        foreach($nodes as $node) {
+            if (!$node->hasChildNodes()) 
+                $node->appendChild ($dom->createTextNode(''));
         }
 
         return 

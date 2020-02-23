@@ -136,6 +136,13 @@ class HarusameTest extends TestCase
         $this->is_same($source, $excpected);
     }
 
+    public function testEmptyNode()
+    {
+        $source = "<div/><span/><td/><th/><br/><hr/><img/><wbr/>";
+        $excpected = "<div></div><span></span><td></td><th></th><br/><hr/><img/><wbr/>";
+        $this->is_same($source, $excpected);
+    }
+
     private function is_same($source, $excpected, $harusame=null)
     {
         if ($harusame) {
