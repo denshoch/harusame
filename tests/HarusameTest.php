@@ -143,6 +143,20 @@ class HarusameTest extends TestCase
         $this->is_same($source, $excpected);
     }
 
+    public function testAttrEncode()
+    {
+        $source = "<div title=\"あいうえお\"></div>";
+        $excpected = "<div title=\"あいうえお\"></div>";
+        $this->is_same($source, $excpected);
+    }
+
+    public function testNSAttrEncode()
+    {
+        $source = "<div epub:type=\"titlepage\"></div>";
+        $excpected = "<div epub:type=\"titlepage\"></div>";
+        $this->is_same($source, $excpected);
+    }
+
     private function is_same($source, $excpected, $harusame=null)
     {
         if ($harusame) {

@@ -154,10 +154,12 @@ class Harusame
     public static function transform(string $text):string
     {
         $dom = new DOMDocument('1.0', 'utf-8');
-        @$dom->loadHTML("<?xml encoding=\"UTF-8\"><html/>");
+        @$dom->loadHTML("<?xml encoding=\"UTF-8\">");
         $fragment = $dom->createDocumentFragment();
-        $fragment->appendXML($text);
-        $dom->documentElement->appendChild($fragment);
+        $fragment->appendXML(
+            '<html xmlns:epub="http://www.idpf.org/2007/ops" xmlns:ssml="https://www.w3.org/2001/10/synthesis">'.$text.'</html>'
+        );
+        $dom->appendChild($fragment);
         unset($fragment);
 
         $xpath = new DOMXpath($dom);
@@ -192,14 +194,16 @@ class Harusame
                 $node->appendChild ($dom->createTextNode(''));
         }
 
-        return 
+        $text = 
             rtrim(
                 preg_replace(
-                    '/^<html>\n?|<\/html>$/',
+                    '/^<html.*?>\n?|<\/html>$/',
                     '',
                     $dom->saveXML($dom->documentElement)
                 )
             );
+        $convmap = array(0x0, 0x10000, 0, 0xfffff);
+        return mb_decode_numericentity($text, $convmap, 'utf-8');
     }
 
     /**
