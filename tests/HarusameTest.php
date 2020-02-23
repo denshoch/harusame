@@ -157,6 +157,16 @@ class HarusameTest extends TestCase
         $this->is_same($source, $excpected);
     }
 
+    /**
+     * @group sp
+     */
+    public function testSpecialChar()
+    {
+        $source = "<h1>&lt;tag&gt;</h1>";
+        $excpected = "<h1>&lt;tag&gt;</h1>";
+        $this->is_same($source, $excpected);
+    }
+
     private function is_same($source, $excpected, $harusame=null)
     {
         if ($harusame) {

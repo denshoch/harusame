@@ -163,7 +163,6 @@ class Harusame
         unset($fragment);
 
         $xpath = new DOMXpath($dom);
-
         $nodes = $xpath->query("//body//text()");
 
         if ($nodes->length === 0) $nodes = $xpath->query("//text()");
@@ -171,7 +170,7 @@ class Harusame
         foreach($nodes as $node) {
             if (self::checkParentNode($node)) continue;
             if (preg_match('/\s+/', $node->nodeValue)) continue;
-
+            $node->textContent = htmlspecialchars($node->textContent);
             $str = self::filter($node->textContent);
             $fragment = $dom->createDocumentFragment();
 
@@ -313,11 +312,11 @@ class Harusame
         $return_text = "";
         foreach ($text_array as $text_array_item) {
             if ( preg_match($fileterReg, $text_array_item) == false ) {
-                if(true === self::$autoTcy) {
+                if(self::$autoTcy) {
                     $text_array_item = self::setTcy($text_array_item); 
                 }
-                if(true === self::$autoTextOrientation) {
-                    $text_array_item = self::setTextOrientation($text_array_item); 
+                if(self::$autoTextOrientation) {
+                    $text_array_item = self::setTextOrientation($text_array_item);
                 }
             }
             $return_text .= $text_array_item;
