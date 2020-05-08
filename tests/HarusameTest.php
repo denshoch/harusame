@@ -167,6 +167,24 @@ class HarusameTest extends TestCase
         $this->is_same($source, $excpected);
     }
 
+    public function testMathml()
+    {
+        $source = "<math><mo>12</mo></math>";
+        $excpected = "<math><mo>12</mo></math>";
+        $this->is_same($source, $excpected);
+
+        $source = '<math xmlns="http://www.w3.org/1998/Math/MathML">12</math>';
+        $excpected = '<math xmlns="http://www.w3.org/1998/Math/MathML">12</math>';
+        $this->is_same($source, $excpected);
+    }
+
+    public function testSvg()
+    {
+        $source = "<svg>12</svg>";
+        $excpected = "<svg>12</svg>";
+        $this->is_same($source, $excpected);
+    }
+
     private function is_same($source, $excpected, $harusame=null)
     {
         if ($harusame) {

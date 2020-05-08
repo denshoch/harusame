@@ -179,7 +179,7 @@ class Harusame
             unset($fragment);
         }
 
-        /** disaallowed empty tags */
+        /** disallowed empty tags */
         $query = "";
         foreach(self::$notEmptyTags as $idx => $tag)
         {
@@ -213,11 +213,18 @@ class Harusame
      */
     public static function checkParentNode(\DOMNode &$node):bool
     {
+
         // === null is faster then is_null()
         if ($node->parentNode === null) return false;
 
         if ($node->nodeType === 1)
         {
+            // check svg and math
+            if ($node->tagName == 'math' || $node->tagName == 'svg')
+            {
+                return true;
+            }
+
             if(!empty($classStr = $node->getAttribute('class')))
             {
                 $arr = [];
