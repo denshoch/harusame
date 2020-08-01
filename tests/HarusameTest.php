@@ -112,6 +112,18 @@ class HarusameTest extends TestCase
         $this->is_sameXML($source, $excpected);
     }
 
+    /**
+     * 
+     */
+    public function testInvalidXML()
+    {
+        $source = "<abc>aaa</efg>";
+        $excpected = $source;
+        $this->expectException(ErrorException::class);
+
+        $this->is_same($source, $excpected);
+    }
+
     public function testURL()
     {
         // パーセントエンコーディングの中の数字がtcyにならないこと
@@ -157,9 +169,6 @@ class HarusameTest extends TestCase
         $this->is_same($source, $excpected);
     }
 
-    /**
-     * @group sp
-     */
     public function testSpecialChar()
     {
         $source = "<h1>&lt;tag&gt;</h1>";
@@ -175,6 +184,10 @@ class HarusameTest extends TestCase
 
         $source = '<math xmlns="http://www.w3.org/1998/Math/MathML">12</math>';
         $excpected = '<math xmlns="http://www.w3.org/1998/Math/MathML">12</math>';
+        $this->is_same($source, $excpected);
+
+        $source = '<figure class="tbl_wrp"><figcaption>数式9</figcaption><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>ファイ係数</mtext><mo>=</mo><mfrac><mrow><mtext>①</mtext><mo>×</mo><mtext>④</mtext><mo>−</mo><mtext>②</mtext><mo>×</mo><mtext>③</mtext></mrow><msqrt><mrow><mtext>⑤</mtext><mo>×</mo><mtext>⑥</mtext><mo>×</mo><mtext>⑦</mtext><mo>×</mo><mtext>⑧</mtext></mrow></msqrt></mfrac></mrow><annotation encoding="TeX">\text{ファイ係数} = \frac{①\times④-②\times③}{\sqrt{⑤\times⑥\times⑦\times⑧}}</annotation></semantics></math> </figure>';
+        $excpected = $source;
         $this->is_same($source, $excpected);
     }
 

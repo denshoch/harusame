@@ -3,12 +3,12 @@
     "type": "library",
     "description": "Add special HTML classes for Tate-Chu-Yoko and text-orientaion.",
     "homepage": "https://github.com/denshoch/harusame",
-    "version": "2.0.2",
+    "version": "2.1.0",
     "license": "MIT",
     "authors": [
         {
             "name": "Densho Channel",
-            "homepage": "http://denshochan.com/",
+            "homepage": "https://denshochan.com/",
             "role": "Developer"
         }
     ],

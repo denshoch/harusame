@@ -154,11 +154,26 @@ class Harusame
     public static function transform(string $text):string
     {
         $dom = new DOMDocument('1.0', 'utf-8');
+
         @$dom->loadHTML("<?xml encoding=\"UTF-8\">");
+
         $fragment = $dom->createDocumentFragment();
-        $fragment->appendXML(
-            '<html xmlns:epub="http://www.idpf.org/2007/ops" xmlns:ssml="https://www.w3.org/2001/10/synthesis">'.$text.'</html>'
-        );
+        set_error_handler(
+            function ($errno, $errstr, $errfile, $errline) {
+              throw new \ErrorException(
+                $errstr, 0, $errno, $errfile, $errline
+              );
+            }
+          );
+        if ( !$fragment->appendXML(
+                '<html xmlns:epub="http://www.idpf.org/2007/ops" xmlns:ssml="https://www.w3.org/2001/10/synthesis">'.$text.'</html>'
+            )
+        ) {
+            fputs(STDERR, "Fail to load XML string. Skip Harusame\n");
+            return $text;
+        }
+        restore_error_handler();
+
         $dom->appendChild($fragment);
         unset($fragment);
 
@@ -243,6 +258,11 @@ class Harusame
         }
 
         return self::checkParentNode($node->parentNode);
+    }
+
+    protected static function handleError($errno, $errstr)
+    {
+        return false;
     }
 
     /**
