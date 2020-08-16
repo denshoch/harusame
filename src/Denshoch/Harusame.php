@@ -234,8 +234,8 @@ class Harusame
 
         if ($node->nodeType === 1)
         {
-            // check svg and math
-            if ($node->tagName == 'math' || $node->tagName == 'svg')
+            // check parent tagname to ignore
+            if (preg_match('/^(code|pre|math|svg)$/', $node->tagName ) === 1)
             {
                 return true;
             }

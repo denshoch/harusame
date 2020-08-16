@@ -198,6 +198,20 @@ class HarusameTest extends TestCase
         $this->is_same($source, $excpected);
     }
 
+    public function testCode()
+    {
+        $source = "<code>12</code>";
+        $excpected = "<code>12</code>";
+        $this->is_same($source, $excpected);
+    }
+
+    public function testPre()
+    {
+        $source = "<pre>12</pre>";
+        $excpected = "<pre>12</pre>";
+        $this->is_same($source, $excpected);
+    }
+
     private function is_same($source, $excpected, $harusame=null)
     {
         if ($harusame) {
