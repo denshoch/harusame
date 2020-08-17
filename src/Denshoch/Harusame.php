@@ -169,6 +169,7 @@ class Harusame
                 '<html xmlns:epub="http://www.idpf.org/2007/ops" xmlns:ssml="https://www.w3.org/2001/10/synthesis">'.$text.'</html>'
             )
         ) {
+            if(!defined('STDERR')) define('STDERR', fopen('php://stderr', 'wb'));
             fputs(STDERR, "Fail to load XML string. Skip Harusame\n");
             return $text;
         }
