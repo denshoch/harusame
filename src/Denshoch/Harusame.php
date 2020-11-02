@@ -184,8 +184,9 @@ class Harusame
         if ($nodes->length === 0) $nodes = $xpath->query("//text()");
         
         foreach($nodes as $node) {
+            
             if (self::checkParentNode($node)) continue;
-            if (preg_match('/\s+/', $node->nodeValue)) continue;
+            if (preg_match('/^\s*$/', $node->nodeValue)) continue; // skip empty line
             $node->textContent = htmlspecialchars($node->textContent);
             $str = self::filter($node->textContent);
             $fragment = $dom->createDocumentFragment();
