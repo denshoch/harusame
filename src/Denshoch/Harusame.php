@@ -103,7 +103,16 @@ class Harusame
         "details",
         "summary",
         "menu",
-        "menuitem"
+        "menuitem",
+        "dialog",
+        "template",
+        "track",
+        "source",
+        "canvas",
+        "font",
+        "center",
+        "marquee",
+        "blink"
     ];
 
     public function __construct(array $options = null)
