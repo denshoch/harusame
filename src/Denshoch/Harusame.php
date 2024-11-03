@@ -168,15 +168,18 @@ class Harusame
                 );
             }
         );
-        if (
-            !$fragment->appendXML(
-                '<html xmlns:epub="http://www.idpf.org/2007/ops" xmlns:ssml="https://www.w3.org/2001/10/synthesis">' . $text . '</html>'
-            )
-        ) {
-            if (!defined('STDERR')) {
-                define('STDERR', fopen('php://stderr', 'wb'));
+
+        try {
+            if (
+                !$fragment->appendXML(
+                    '<html xmlns:epub="http://www.idpf.org/2007/ops" xmlns:ssml="https://www.w3.org/2001/10/synthesis">' . $text . '</html>'
+                )
+            ) {
+                error_log("Invalid XML string provided. Original text returned.");
+                return $text;
             }
-            fputs(STDERR, "Fail to load XML string. Skip Harusame\n");
+        } catch (\ErrorException $e) {
+            error_log("Error processing XML: " . $e->getMessage());
             return $text;
         }
         restore_error_handler();
@@ -370,7 +373,7 @@ class Harusame
         // 文字参照の正規表現断片
         $charRefRegFlagment = "&#?[a-z0-9]{2,8};";
 
-        // 除外する正規表現パターン組み立て
+        // 除外する正規表現���ターン組み立て
         $fileterReg = "`($urlRegFlagment|$mailRegFlagment|$charRefRegFlagment)`i";
 
         $text_array = preg_split($fileterReg, $text, 0, PREG_SPLIT_DELIM_CAPTURE);

@@ -118,10 +118,10 @@ class HarusameTest extends TestCase
     public function testInvalidXML()
     {
         $source = "<abc>aaa</efg>";
-        $excpected = $source;
-        $this->expectException(ErrorException::class);
+        $expected = $source; // Should return the original text
 
-        $this->is_same($source, $excpected);
+        $result = $this->harusame->transform($source);
+        $this->assertSame($expected, $result);
     }
 
     public function testURL()

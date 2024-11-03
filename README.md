@@ -77,9 +77,12 @@ $harusame->transform('10円玉と100円玉がある。');
 | tcyDigit             | integer  | 2       | Maximum number of digits to add `.tcy` class. If set to 0, no `.tcy` class will be added. |
 | autoTextOrientation   | boolean  | true    | Add `.upright` and `.sideways` class or not. |
 
+## Error Handling
+
+When invalid XML is provided as input, the `transform` method will return the original text instead of throwing an exception. Additionally, an error message will be logged to indicate that invalid XML was encountered. This allows for graceful handling of errors while still providing feedback about the issue.
+
 Test
 -----
 
 ```
 $ vendor/bin/phpunit
-```
