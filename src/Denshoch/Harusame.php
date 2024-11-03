@@ -230,22 +230,21 @@ class Harusame
      */
     public static function checkParentNode(\DOMNode $node):bool
     {
-
-        // === null is faster then is_null()
+        // === null is faster than is_null()
         if ($node->parentNode === null) return false;
 
-        if ($node->nodeType === 1)
+        if ($node->nodeType === 1) // 1はELEMENT_NODEを示します
         {
             // check parent tagname to ignore
-            if (preg_match('/^(code|pre|math|svg)$/', $node->tagName ) === 1)
+            if (preg_match('/^(code|pre|math|svg)$/', $node->nodeName) === 1) // nodeNameを使用
             {
                 return true;
             }
 
-            if(!empty($classStr = $node->getAttribute('class')))
+            if (!empty($classStr = $node->getAttribute('class'))) // getAttributeメソッドを使用
             {
                 $arr = [];
-                foreach(preg_split('/\s/', $classStr) as $class) {
+                foreach (preg_split('/\s/', $classStr) as $class) {
                     $arr[$class] = true;
                 }
                 // isset() is faster than in_array()
@@ -285,7 +284,8 @@ class Harusame
             ']{1,4}:){5}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:\d|[1' .
             '-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(?:\d|[1-9]\d|1\d{' .
             '2}|2[0-4]\d|25[0-5])\.(?:\d|[1-9]\d|1\d{2}|2[0-4]\\' .
-            'd|25[0-5])\.(?:\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])' .
+            'd|25[0-5])\.(?:\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-' .
+            '5])' .
             ')|(?:[0-9a-f]{1,4})?+::(?:[0-9a-f]{1,4}:){4}(?:[0-' .
             '9a-f]{1,4}:[0-9a-f]{1,4}|(?:\d|[1-9]\d|1\d{2}|2[0-' .
             '4]\d|25[0-5])\.(?:\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-' .
