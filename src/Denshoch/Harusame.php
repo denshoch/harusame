@@ -106,43 +106,42 @@ class Harusame
         "menuitem"
     ];
 
-    public function __construct(array $options=null)
+    public function __construct(array $options = null)
     {
         self::$autoTcy = true;
         self::$tcyDigit = 2;
         self::$autoTextOrientation = true;
 
         // !== null is faster than is_null()
-		if ($options !== null){
+        if ($options !== null) {
+            if (array_key_exists("autoTcy", $options)) {
+                if (is_bool($options["autoTcy"])) {
+                    self::$autoTcy = $options["autoTcy"];
+                } else {
+                    trigger_error("autoTcy should be boolean.");
+                }
+            }
 
-		    if(array_key_exists("autoTcy", $options)){
-		  	    if (is_bool($options["autoTcy"])) {
-		  		    self::$autoTcy = $options["autoTcy"];
-		  	    } else {
-		  		    trigger_error("autoTcy should be boolean.");
-		  	    }
-		    }
-
-		    if(array_key_exists("tcyDigit", $options)){
-		  	    if (is_int($options["tcyDigit"])) {
-		  	    	if ($options["tcyDigit"] < 2) {
+            if (array_key_exists("tcyDigit", $options)) {
+                if (is_int($options["tcyDigit"])) {
+                    if ($options["tcyDigit"] < 2) {
                         trigger_error("tcyDigit should be 2 or greater.", E_USER_ERROR);
-		  	    	} else {
-		  	    		self::$tcyDigit = $options["tcyDigit"];
-		  	    	}
-		  	    } else {
-		  		    trigger_error("tcyDigit should be int.");
-		  	    }
-		    }
+                    } else {
+                        self::$tcyDigit = $options["tcyDigit"];
+                    }
+                } else {
+                    trigger_error("tcyDigit should be int.");
+                }
+            }
 
-		    if(array_key_exists("autoTextOrientation", $options)){
-		  	    if (is_bool($options["autoTextOrientation"])) {
-		  		    self::$autoTextOrientation = $options["autoTextOrientation"];
-		  	    } else {
-		  		    trigger_error("autoTextOrientation should be boolean.");
-		  	    }
-		    }
-		}
+            if (array_key_exists("autoTextOrientation", $options)) {
+                if (is_bool($options["autoTextOrientation"])) {
+                    self::$autoTextOrientation = $options["autoTextOrientation"];
+                } else {
+                    trigger_error("autoTextOrientation should be boolean.");
+                }
+            }
+        }
     }
 
     /**
@@ -151,7 +150,7 @@ class Harusame
      * @param string $text Input text to transform.
      * @return string transformed text.
      */
-    public static function transform(string $text):string
+    public static function transform(string $text): string
     {
         $dom = new DOMDocument('1.0', 'utf-8');
 
@@ -228,7 +227,7 @@ class Harusame
      * @param \DOMNode $node
      * @return boolean
      */
-    public static function checkParentNode(\DOMNode $node):bool
+    public static function checkParentNode(\DOMNode $node): bool
     {
         // === null is faster than is_null()
         if ($node->parentNode === null) return false;
@@ -262,7 +261,14 @@ class Harusame
         return self::checkParentNode($node->parentNode);
     }
 
-    protected static function handleError($errno, $errstr)
+    /**
+     * handleError
+     * 
+     * @param int $errno
+     * @param string $errstr
+     * @return bool
+     */
+    protected static function handleError(int $errno, string $errstr): bool
     {
         return false;
     }
@@ -273,7 +279,7 @@ class Harusame
      * @param string $text
      * @return string Transformed text.
      */
-    private static function filter(string $text):string
+    private static function filter(string $text): string
     {
         // URLの正規表現断片 http://qiita.com/mpyw/items/1e422848030fcde0f29a
         $urlRegFlagment = 'https?+:(?://(?:(?:[-.0-9_a-z~]|%[0-9a-f][0-9a-f]' .
@@ -361,7 +367,7 @@ class Harusame
      * @param string $text
      * @return string Transformted text.
      */
-    private static function setTcy(string $text):string
+    private static function setTcy(string $text): string
     {
     	$emoReg = "/(^|[^!?])([!?]{2})(?![!?])/u";
     	$text = preg_replace($emoReg, '\1<span class="tcy">\2</span>', $text);
@@ -377,7 +383,7 @@ class Harusame
      * @param string $text
      * @return string Transformted text.
      */
-    private static function setTextOrientation(string $text):string
+    private static function setTextOrientation(string $text): string
     {
         //　横転処理
         $sidewaysReg = "/(÷|&#xf7;|&#247;|∴|&#x2234;|&#8756;|≠|&#x2260;|&#8800;|≦|&#x2266;|&#8806;|≧|&#x2267;|&#8807;|∧|&#x2227;|&#8743;|∨|&#x2228;|&#8744;|＜|&#xff1c;|&#65308;|＞|&#xff1e;|&#65310;|‐|&#x2010;|&#8208;|－|&#xff0d;|&#65293;)/u";
