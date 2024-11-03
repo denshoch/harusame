@@ -230,6 +230,20 @@ class Harusame
     }
 
     /**
+     * transform text with options
+     *
+     * @param string $text Input text to transform.
+     * @param array|null $options Options for transformation.
+     * @return string transformed text.
+     */
+    public static function transformText(string $text, ?array $options = null): string
+    {
+        // オプションを適用するための一時的なインスタンスを作成
+        $harusame = new self($options);
+        return $harusame->transform($text);
+    }
+
+    /**
      * checkParentNode
      *
      * @param \DOMNode $node

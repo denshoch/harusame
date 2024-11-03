@@ -16,7 +16,12 @@ Harusameは、特定のHTML要素に対して特別なクラスを追加する�
 ## 使用方法
 ```php
 $harusame = new Denshoch\Harusame();
-$result = $harusame->transform('テキスト例');
+$result = $harusame->transformText('テキスト例', ['tcyDigit' => 3]);
+// => <span class="tcy">テキスト例</span>
+
+// オプションを指定しない場合
+$result = $harusame->transformText('テキスト例');
+// => <span class="tcy">テキスト例</span>（デフォルトのtcyDigitが適用されます）
 ```
 
 ## オプション

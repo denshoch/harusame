@@ -31,6 +31,20 @@ composer install
 Usage
 ------
 
+New static method `transformText`
+
+```php
+$result = Denshoch\Harusame::transformText('平成20年!?');
+// => 平成<span class="tcy">20</span>年<span class="tcy">!?</span>
+
+// With options
+$options = ['tcyDigit' => 3];
+$result = Denshoch\Harusame::transformText('10円玉と100円玉がある。', $options);
+// => <span class="tcy">10</span>円玉と<span class="tcy">100</span>円玉がある。
+```
+
+Previous usage
+
 ```php
 $harusame = new Denshoch\Harusame();
 $harusame->transform('平成20年!?');
