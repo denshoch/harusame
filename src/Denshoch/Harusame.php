@@ -228,7 +228,7 @@ class Harusame
      * @param DOMNode $node
      * @return boolean
      */
-    public static function checkParentNode(\DOMNode &$node):bool
+    public static function checkParentNode(\DOMNode $node):bool
     {
 
         // === null is faster then is_null()
@@ -336,7 +336,7 @@ class Harusame
         // 除外する正規表現パターン組み立て
         $fileterReg = "`($urlRegFlagment|$mailRegFlagment|$charRefRegFlagment)`i";
 
-        $text_array= preg_split($fileterReg, $text, null, PREG_SPLIT_DELIM_CAPTURE);
+        $text_array= preg_split($fileterReg, $text, 0, PREG_SPLIT_DELIM_CAPTURE);
 
         $return_text = "";
         foreach ($text_array as $text_array_item) {
