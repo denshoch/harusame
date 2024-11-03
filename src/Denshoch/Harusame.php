@@ -241,7 +241,8 @@ class Harusame
                 return true;
             }
 
-            if (!empty($classStr = $node->getAttribute('class'))) // getAttributeメソッドを使用
+            // DOMNodeがDOMElementであることを確認
+            if ($node instanceof \DOMElement && !empty($classStr = $node->getAttribute('class'))) // getAttributeメソッドを使用
             {
                 $arr = [];
                 foreach (preg_split('/\s/', $classStr) as $class) {
