@@ -35,7 +35,7 @@
             "@phpstan",
             "@phpcs"
         ],
-        "phpunit": "phpunit",
+        "phpunit": "phpunit tests",
         "phpstan": "phpstan analyse src --level max",
         "phpcs": "phpcs src --standard=PSR12",
         "phpcbf": "phpcbf src --standard=PSR12"
