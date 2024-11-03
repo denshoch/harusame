@@ -6,10 +6,10 @@ use DOMXpath;
 
 class Harusame
 {
-	protected static $autoTcy = true;
-	protected static $tcyDigit = 2;
-    protected static $autoTextOrientation = true;
-    protected static $notEmptyTags = [
+    protected static bool $autoTcy = true;
+    protected static int $tcyDigit = 2;
+    protected static bool $autoTextOrientation = true;
+    protected static array $notEmptyTags = [
         "article",
         "section",
         "nav",
