@@ -225,7 +225,7 @@ class Harusame
     /**
      * checkParentNode
      * 
-     * @param DOMNode $node
+     * @param \DOMNode $node
      * @return boolean
      */
     public static function checkParentNode(\DOMNode $node):bool
