@@ -163,12 +163,12 @@ class Harusame
                 $errstr, 0, $errno, $errfile, $errline
               );
             }
-          );
-        if ( !$fragment->appendXML(
+        );
+        if (!$fragment->appendXML(
                 '<html xmlns:epub="http://www.idpf.org/2007/ops" xmlns:ssml="https://www.w3.org/2001/10/synthesis">'.$text.'</html>'
             )
         ) {
-            if(!defined('STDERR')) define('STDERR', fopen('php://stderr', 'wb'));
+            if (!defined('STDERR')) define('STDERR', fopen('php://stderr', 'wb'));
             fputs(STDERR, "Fail to load XML string. Skip Harusame\n");
             return $text;
         }
@@ -180,33 +180,36 @@ class Harusame
         $xpath = new DOMXpath($dom);
         $nodes = $xpath->query("//body//text()");
 
-        if ($nodes->length === 0) $nodes = $xpath->query("//text()");
-        
-        foreach($nodes as $node) {
-            
-            if (self::checkParentNode($node)) continue;
-            if (preg_match('/^\s*$/', $node->nodeValue)) continue; // skip empty line
-            $node->textContent = htmlspecialchars($node->textContent);
-            $str = self::filter($node->textContent);
-            $fragment = $dom->createDocumentFragment();
+        if ($nodes === false || $nodes->length === 0) {
+            $nodes = $xpath->query("//text()");
+        }
 
-            $fragment->appendXML($str);
-            $node->parentNode->replaceChild($fragment, $node);
-            unset($fragment);
+        if ($nodes !== false) {
+            foreach ($nodes as $node) {
+                if (self::checkParentNode($node)) continue;
+                if (preg_match('/^\s*$/', $node->nodeValue)) continue; // skip empty line
+                $node->textContent = htmlspecialchars($node->textContent);
+                $str = self::filter($node->textContent);
+                $fragment = $dom->createDocumentFragment();
+
+                $fragment->appendXML($str);
+                $node->parentNode->replaceChild($fragment, $node);
+                unset($fragment);
+            }
         }
 
         /** disallowed empty tags */
         $query = "";
-        foreach(self::$notEmptyTags as $idx => $tag)
-        {
+        foreach (self::$notEmptyTags as $idx => $tag) {
             if ($idx !== 0) $query .= " | ";
-
             $query .= "//$tag";
         }
         $nodes = $xpath->query($query);
-        foreach($nodes as $node) {
-            if (!$node->hasChildNodes()) 
-                $node->appendChild ($dom->createTextNode(''));
+        if ($nodes !== false) {
+            foreach ($nodes as $node) {
+                if (!$node->hasChildNodes()) 
+                    $node->appendChild($dom->createTextNode(''));
+            }
         }
 
         $text = 
