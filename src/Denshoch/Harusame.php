@@ -7,7 +7,6 @@ use DOMXpath;
 
 class Harusame
 {
-    protected static bool $autoTcy = true;
     protected static int $tcyDigit = 2;
     protected static bool $autoTextOrientation = true;
     protected static array $notEmptyTags = [
@@ -109,24 +108,15 @@ class Harusame
 
     public function __construct(array $options = null)
     {
-        self::$autoTcy = true;
         self::$tcyDigit = 2;
         self::$autoTextOrientation = true;
 
         // !== null is faster than is_null()
         if ($options !== null) {
-            if (array_key_exists("autoTcy", $options)) {
-                if (is_bool($options["autoTcy"])) {
-                    self::$autoTcy = $options["autoTcy"];
-                } else {
-                    trigger_error("autoTcy should be boolean.");
-                }
-            }
-
             if (array_key_exists("tcyDigit", $options)) {
                 if (is_int($options["tcyDigit"])) {
-                    if ($options["tcyDigit"] < 2) {
-                        trigger_error("tcyDigit should be 2 or greater.", E_USER_ERROR);
+                    if ($options["tcyDigit"] < 0) {
+                        trigger_error("tcyDigit should be 0 or greater.", E_USER_ERROR);
                     } else {
                         self::$tcyDigit = $options["tcyDigit"];
                     }
@@ -253,7 +243,7 @@ class Harusame
         }
 
         if ($node->nodeType === 1) { // 1はELEMENT_NODEを示します
-        // check parent tagname to ignore
+            // check parent tagname to ignore
             if (preg_match('/^(code|pre|math|svg)$/', $node->nodeName) === 1) { // nodeNameを使用
                 return true;
             }
@@ -319,13 +309,13 @@ class Harusame
             '[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:\d|[1-9]\d|1\d{2}|2' .
             '[0-4]\d|25[0-5])\.(?:\d|[1-9]\d|1\d{2}|2[0-4]\d|25' .
             '[0-5])\.(?:\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(?' .
-            ':\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(?:(?:[0-9a-' .
-            'f]{1,4}:){0,2}[0-9a-f]{1,4})?+::(?:[0-9a-f]{1,4}:)' .
+            ':\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(?:(?:[0-9a-f]{' .
+            '1,4}:){0,2}[0-9a-f]{1,4})?+::(?:[0-9a-f]{1,4}:)' .
             '{2}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:\d|[1-9]\d|1\\' .
             'd{2}|2[0-4]\d|25[0-5])\.(?:\d|[1-9]\d|1\d{2}|2[0-4' .
-            ']\d|25[0-5])\.(?:\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5' .
-            '])\.(?:\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(?:(?:' .
-            '[0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?+::[0-9a-f]{1,4' .
+            '\d|25[0-5])\.(?:\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]' .
+            ')\.(?:\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(?:(?:[' .
+            '0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?+::[0-9a-f]{1,4' .
             '}:(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:\d|[1-9]\d|1\d' .
             '{2}|2[0-4]\d|25[0-5])\.(?:\d|[1-9]\d|1\d{2}|2[0-4]' .
             '\d|25[0-5])\.(?:\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]' .
@@ -365,7 +355,7 @@ class Harusame
         $return_text = "";
         foreach ($text_array as $text_array_item) {
             if (preg_match($fileterReg, $text_array_item) == false) {
-                if (self::$autoTcy) {
+                if (self::$tcyDigit >= 2) {
                     $text_array_item = self::setTcy($text_array_item);
                 }
                 if (self::$autoTextOrientation) {
