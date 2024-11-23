@@ -217,7 +217,7 @@ class Harusame
                 }
 
                 $node->textContent = htmlspecialchars($textContent);
-                $str = self::filter($node->textContent ?? '');
+                $str = self::filter($node->textContent);
                 $fragment = $dom->createDocumentFragment();
 
                 $fragment->appendXML($str);
@@ -267,10 +267,13 @@ class Harusame
      * @param string $text Input text to transform.
      * @param array<string, mixed>|null $options Options for transformation.
      * @return string transformed text.
+     * @throws IllegalArgumentException オプションの値が不正な場合
      */
     public static function transformText(string $text, ?array $options = null): string
     {
-        $harusame = new self($options);
+        /** @var array{tcyDigit?: int, autoTextOrientation?: bool}|null */
+        $validatedOptions = $options;
+        $harusame = new self($validatedOptions);
         return $harusame->transform($text);
     }
 
