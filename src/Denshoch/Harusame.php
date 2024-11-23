@@ -204,15 +204,25 @@ class Harusame
                 if (self::checkParentNode($node)) {
                     continue;
                 }
-                if (preg_match('/^\s*$/', $node->nodeValue)) {
-                    continue; // skip empty line
+                
+                $nodeValue = $node->nodeValue;
+                if ($nodeValue === null || preg_match('/^\s*$/', $nodeValue)) {
+                    continue; // skip empty line or null
                 }
-                $node->textContent = htmlspecialchars($node->textContent);
-                $str = self::filter($node->textContent);
+                
+                $textContent = $node->textContent;
+                if ($textContent === null) {
+                    continue;
+                }
+                
+                $node->textContent = htmlspecialchars($textContent);
+                $str = self::filter($node->textContent ?? '');
                 $fragment = $dom->createDocumentFragment();
 
                 $fragment->appendXML($str);
-                $node->parentNode->replaceChild($fragment, $node);
+                if ($node->parentNode !== null) {
+                    $node->parentNode->replaceChild($fragment, $node);
+                }
                 unset($fragment);
             }
         }
@@ -330,6 +340,10 @@ class Harusame
      */
     private static function filter(string $text): string
     {
+        if (empty($text)) {
+            return '';
+        }
+        
         // URLの正規表現断片 http://qiita.com/mpyw/items/1e422848030fcde0f29a
         $urlRegFlagment = 'https?+:(?://(?:(?:[-.0-9_a-z~]|%[0-9a-f][0-9a-f]' .
             '|[!$&-,:;=])*+@)?+(?:\[(?:(?:[0-9a-f]{1,4}:){6}(?:' .
@@ -417,10 +431,14 @@ class Harusame
      * setTcy
      *
      * @param string $text
-     * @return string Transformted text.
+     * @return string Transformed text.
      */
     private static function setTcy(string $text): string
     {
+        if (empty($text)) {
+            return '';
+        }
+        
         $emoReg = "/(^|[^!?])([!?]{2})(?![!?])/u";
         $text = preg_replace($emoReg, '\1<span class="tcy">\2</span>', $text) ?? $text;
 
@@ -432,10 +450,14 @@ class Harusame
      * setTextOrientation
      *
      * @param string $text
-     * @return string Transformted text.
+     * @return string Transformed text.
      */
     private static function setTextOrientation(string $text): string
     {
+        if (empty($text)) {
+            return '';
+        }
+        
         //　横転処理
         $sidewaysReg = "/(÷|&#xf7;|&#247;|∴|&#x2234;|&#8756;|≠|&#x2260;|&#8800;|≦|&#x2266;|&#8806;|≧|&#x2267;|&#8807;|∧|&#x2227;|&#8743;|∨|&#x2228;|&#8744;|＜|&#xff1c;|&#65308;|＞|&#xff1e;|&#65310;|‐|&#x2010;|&#8208;|－|&#xff0d;|&#65293;)/u";
 
