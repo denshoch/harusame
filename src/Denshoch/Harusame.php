@@ -283,24 +283,26 @@ class Harusame
             }
 
             // DOMNodeがDOMElementであることを確認
-            $classStr = $node->getAttribute('class');
-            if (!empty($classStr)) {
-                $classes = preg_split('/\s/', $classStr);
-                if ($classes === false) {
-                    return false;
-                }
-                
-                $arr = [];
-                foreach ($classes as $class) {
-                    $arr[$class] = true;
-                }
-                
-                if (
-                    isset($arr['tcy']) ||
-                    isset($arr['upright']) ||
-                    isset($arr['sideways'])
-                ) {
-                    return true;
+            if ($node instanceof \DOMElement) {
+                $classStr = $node->getAttribute('class');
+                if (!empty($classStr)) {
+                    $classes = preg_split('/\s/', $classStr);
+                    if ($classes === false) {
+                        return false;
+                    }
+                    
+                    $arr = [];
+                    foreach ($classes as $class) {
+                        $arr[$class] = true;
+                    }
+                    
+                    if (
+                        isset($arr['tcy']) ||
+                        isset($arr['upright']) ||
+                        isset($arr['sideways'])
+                    ) {
+                        return true;
+                    }
                 }
             }
         }
