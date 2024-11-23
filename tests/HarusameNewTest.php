@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 use Denshoch\Harusame;
+use Denshoch\Exception\InvalidXMLException;
 
 class HarusameNewTest extends TestCase
 {
@@ -44,12 +45,14 @@ class HarusameNewTest extends TestCase
         $this->assertStringContainsString('<span class="tcy">12</span>', $result);
     }
 
-    public function testTransformTextWithInvalidHtml()
+    /**
+     * @test
+     */
+    public function testTransformTextWithInvalidHtml(): void
     {
-        $invalidHtml = "<abc>aaa</efg>";
-        $expected = $invalidHtml; // Should return the original text
+        $this->expectException(InvalidXMLException::class);
+        $this->expectExceptionMessage("Error processing XML: DOMDocumentFragment::appendXML(): Entity: line 1: parser error : Opening and ending tag mismatch: abc line 1 and efg");
         
-        $result = Harusame::transformText($invalidHtml);
-        $this->assertSame($expected, $result);
+        Harusame::transformText("<abc>aaa</efg>");
     }
 } 

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<ruleset name="Custom Standard">
+    <description>Custom coding standard</description>
+
+    <!-- PSR12をベースとして使用 -->
+    <rule ref="PSR12">
+        <!-- 行の長さ制限を除外 -->
+        <exclude name="Generic.Files.LineLength"/>
+    </rule>
+</ruleset> 

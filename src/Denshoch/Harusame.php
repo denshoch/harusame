@@ -4,6 +4,8 @@ namespace Denshoch;
 
 use DOMDocument;
 use DOMXpath;
+use Denshoch\Exception\IllegalArgumentException;
+use Denshoch\Exception\InvalidXMLException;
 
 class Harusame
 {
@@ -118,6 +120,8 @@ class Harusame
 
     /**
      * @param array{tcyDigit?: int, autoTextOrientation?: bool}|null $options
+     * @throws IllegalArgumentException tcyDigitが整数でない、または0未満の場合、
+     *         またはautoTextOrientationがブール値でない場合
      */
     public function __construct(?array $options = null)
     {
@@ -128,12 +132,10 @@ class Harusame
             if (array_key_exists("tcyDigit", $options)) {
                 $tcyDigit = $options["tcyDigit"];
                 if (!is_int($tcyDigit)) {
-                    trigger_error("tcyDigit should be int.", E_USER_WARNING);
-                    return;
+                    throw new IllegalArgumentException("tcyDigit should be int.");
                 }
                 if ($tcyDigit < 0) {
-                    trigger_error("tcyDigit should be 0 or greater.", E_USER_ERROR);
-                    return;
+                    throw new IllegalArgumentException("tcyDigit should be 0 or greater.");
                 }
                 self::$tcyDigit = $tcyDigit;
             }
@@ -141,8 +143,7 @@ class Harusame
             if (array_key_exists("autoTextOrientation", $options)) {
                 $autoTextOrientation = $options["autoTextOrientation"];
                 if (!is_bool($autoTextOrientation)) {
-                    trigger_error("autoTextOrientation should be boolean.", E_USER_WARNING);
-                    return;
+                    throw new IllegalArgumentException("autoTextOrientation should be boolean.");
                 }
                 self::$autoTextOrientation = $autoTextOrientation;
             }
@@ -154,6 +155,7 @@ class Harusame
      *
      * @param string $text Input text to transform.
      * @return string transformed text.
+     * @throws InvalidXMLException DOM構築に失敗した場合
      */
     public static function transform(string $text): string
     {
@@ -180,14 +182,13 @@ class Harusame
                     '<html xmlns:epub="http://www.idpf.org/2007/ops" xmlns:ssml="https://www.w3.org/2001/10/synthesis">' . $text . '</html>'
                 )
             ) {
-                error_log("Invalid XML string provided. Original text returned.");
-                return $text;
+                throw new InvalidXMLException("Invalid XML string provided.");
             }
         } catch (\ErrorException $e) {
-            error_log("Error processing XML: " . $e->getMessage());
-            return $text;
+            throw new InvalidXMLException("Error processing XML: " . $e->getMessage(), 0, $e);
+        } finally {
+            restore_error_handler();
         }
-        restore_error_handler();
 
         $dom->appendChild($fragment);
         unset($fragment);
@@ -204,17 +205,17 @@ class Harusame
                 if (self::checkParentNode($node)) {
                     continue;
                 }
-                
+
                 $nodeValue = $node->nodeValue;
                 if ($nodeValue === null || preg_match('/^\s*$/', $nodeValue)) {
                     continue; // skip empty line or null
                 }
-                
+
                 $textContent = $node->textContent;
                 if ($textContent === null) {
                     continue;
                 }
-                
+
                 $node->textContent = htmlspecialchars($textContent);
                 $str = self::filter($node->textContent ?? '');
                 $fragment = $dom->createDocumentFragment();
@@ -248,7 +249,7 @@ class Harusame
         if ($xml === false) {
             return $text;
         }
-        
+
         $text = rtrim(
             preg_replace(
                 '/^<html.*?>\n?|<\/html>$/',
@@ -300,12 +301,12 @@ class Harusame
                     if ($classes === false) {
                         return false;
                     }
-                    
+
                     $arr = [];
                     foreach ($classes as $class) {
                         $arr[$class] = true;
                     }
-                    
+
                     if (
                         isset($arr['tcy']) ||
                         isset($arr['upright']) ||
@@ -343,7 +344,7 @@ class Harusame
         if (empty($text)) {
             return '';
         }
-        
+
         // URLの正規表現断片 http://qiita.com/mpyw/items/1e422848030fcde0f29a
         $urlRegFlagment = 'https?+:(?://(?:(?:[-.0-9_a-z~]|%[0-9a-f][0-9a-f]' .
             '|[!$&-,:;=])*+@)?+(?:\[(?:(?:[0-9a-f]{1,4}:){6}(?:' .
@@ -438,7 +439,7 @@ class Harusame
         if (empty($text)) {
             return '';
         }
-        
+
         $emoReg = "/(^|[^!?])([!?]{2})(?![!?])/u";
         $text = preg_replace($emoReg, '\1<span class="tcy">\2</span>', $text) ?? $text;
 
@@ -457,7 +458,7 @@ class Harusame
         if (empty($text)) {
             return '';
         }
-        
+
         //　横転処理
         $sidewaysReg = "/(÷|&#xf7;|&#247;|∴|&#x2234;|&#8756;|≠|&#x2260;|&#8800;|≦|&#x2266;|&#8806;|≧|&#x2267;|&#8807;|∧|&#x2227;|&#8743;|∨|&#x2228;|&#8744;|＜|&#xff1c;|&#65308;|＞|&#xff1e;|&#65310;|‐|&#x2010;|&#8208;|－|&#xff0d;|&#65293;)/u";
 
