@@ -126,23 +126,25 @@ class Harusame
 
         if ($options !== null) {
             if (array_key_exists("tcyDigit", $options)) {
-                if (is_int($options["tcyDigit"])) {
-                    if ($options["tcyDigit"] < 0) {
-                        trigger_error("tcyDigit should be 0 or greater.", E_USER_ERROR);
-                    } else {
-                        self::$tcyDigit = $options["tcyDigit"];
-                    }
-                } else {
-                    trigger_error("tcyDigit should be int.");
+                $tcyDigit = $options["tcyDigit"];
+                if (!is_int($tcyDigit)) {
+                    trigger_error("tcyDigit should be int.", E_USER_WARNING);
+                    return;
                 }
+                if ($tcyDigit < 0) {
+                    trigger_error("tcyDigit should be 0 or greater.", E_USER_ERROR);
+                    return;
+                }
+                self::$tcyDigit = $tcyDigit;
             }
 
             if (array_key_exists("autoTextOrientation", $options)) {
-                if (is_bool($options["autoTextOrientation"])) {
-                    self::$autoTextOrientation = $options["autoTextOrientation"];
-                } else {
-                    trigger_error("autoTextOrientation should be boolean.");
+                $autoTextOrientation = $options["autoTextOrientation"];
+                if (!is_bool($autoTextOrientation)) {
+                    trigger_error("autoTextOrientation should be boolean.", E_USER_WARNING);
+                    return;
                 }
+                self::$autoTextOrientation = $autoTextOrientation;
             }
         }
     }
@@ -281,12 +283,18 @@ class Harusame
             }
 
             // DOMNodeがDOMElementであることを確認
-            if ($node instanceof \DOMElement && !empty($classStr = $node->getAttribute('class'))) { // getAttributeメソッドを使用
+            $classStr = $node->getAttribute('class');
+            if (!empty($classStr)) {
+                $classes = preg_split('/\s/', $classStr);
+                if ($classes === false) {
+                    return false;
+                }
+                
                 $arr = [];
-                foreach (preg_split('/\s/', $classStr) as $class) {
+                foreach ($classes as $class) {
                     $arr[$class] = true;
                 }
-                // isset() is faster than in_array()
+                
                 if (
                     isset($arr['tcy']) ||
                     isset($arr['upright']) ||
@@ -334,9 +342,9 @@ class Harusame
             '5])' .
             ')|(?:[0-9a-f]{1,4})?+::(?:[0-9a-f]{1,4}:){4}(?:[0-' .
             '9a-f]{1,4}:[0-9a-f]{1,4}|(?:\d|[1-9]\d|1\d{2}|2[0-' .
-            '4]\d|25[0-5])\.(?:\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-' .
-            '5])\.(?:\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(?:\d' .
-            '|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(?:(?:[0-9a-f]{' .
+            '4]\d|25[0-5])\.(?:\d|[1-9]\d|1\d{2}|2[0-4]\d|25' .
+            '[0-5])\.(?:\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(?' .
+            ':\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(?:(?:[0-9a-f]{' .
             '1,4}:)?+[0-9a-f]{1,4})?+::(?:[0-9a-f]{1,4}:){3}(?:' .
             '[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:\d|[1-9]\d|1\d{2}|2' .
             '[0-4]\d|25[0-5])\.(?:\d|[1-9]\d|1\d{2}|2[0-4]\d|25' .
