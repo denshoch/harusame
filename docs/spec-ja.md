@@ -20,6 +20,8 @@ Harusameは、特定のHTML要素に対して特別なクラスを追加する�
     - `tcy`: 縦中横の処理を行うためのクラス。
     - `upright`: 正立のテキストを示すためのクラス。
     - `sideways`: 横転のテキストを示すためのクラス。
+  - 除外判定は再帰的に親ノードまで遡って行われる
+  - 空のノードの場合は処理をスキップ
 
 - **メールアドレスは変換処理から除外する**:
   - メールアドレスは、変換処理の対象外とし、元の形式を保持する。
@@ -46,7 +48,10 @@ Harusameは、特定のHTML要素に対して特別なクラスを追加する�
 
 ### フィルタリング処理
 - **URL、メールアドレス、文字参照を検出し、除外する**:
-  - URL、メールアドレス、文字参照を正規表現で検出し、変換処理から除外するためのフィルタリング処理が必要。
+  - URL: 複雑なIPv4/IPv6アドレスを含むURLパターン
+  - メールアドレス: `[0-9a-z_./?-]+@(?:[0-9a-z-]+\.)+[0-9a-z-]+`
+  - HTML文字参照: `&#?[a-z0-9]{2,8};`
+  - 除外されたパターンは変換処理を行わず、そのまま出力される
 
 ## 主な機能
 1. **テキスト変換**:
@@ -74,7 +79,22 @@ $result = $harusame->transformText('テキスト例');
 - `autoTextOrientation`: boolean（デフォルトはtrue） - `.upright`および`.sideways`クラスを追加するかどうか。
 
 ## エラーハンドリング
-- `transform`メソッドは、無効なHTML入力に対してエラーハンドリングを行います。処理できない場合は、元のテキストを返し、エラーメッセージをSTDERRに出力します。
+
+### XMLパース時のエラー処理
+- **不正なXMLの処理**:
+  - 不正なXMLが入力された場合、InvalidXMLExceptionがスローされる
+  - エラーメッセージには具体的なエラー内容が含まれる
+  - エラー発生時は元のテキストを返却
+
+### オプションのバリデーション
+- **tcyDigitオプション**:
+  - 整数値でない場合、IllegalArgumentExceptionをスロー
+  - 0未満の値の場合、IllegalArgumentExceptionをスロー
+  - エラーメッセージ: "tcyDigit should be int." または "tcyDigit should be 0 or greater."
+
+- **autoTextOrientationオプション**:
+  - 真偽値でない場合、IllegalArgumentExceptionをスロー
+  - エラーメッセージ: "autoTextOrientation should be boolean."
 
 ## テスト
 - PHPUnitを使用してテストを実行します。テストは`tests`ディレクトリ内に配置されています。
