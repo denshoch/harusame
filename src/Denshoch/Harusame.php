@@ -116,6 +116,9 @@ class Harusame
         "blink"
     ];
 
+    /**
+     * @param array{tcyDigit?: int, autoTextOrientation?: bool}|null $options
+     */
     public function __construct(?array $options = null)
     {
         self::$tcyDigit = 2;
@@ -229,12 +232,17 @@ class Harusame
             }
         }
 
+        $xml = $dom->saveXML($dom->documentElement);
+        if ($xml === false) {
+            return $text;
+        }
+        
         $text = rtrim(
             preg_replace(
                 '/^<html.*?>\n?|<\/html>$/',
                 '',
-                $dom->saveXML($dom->documentElement) ?? ''
-            ) ?? ''
+                $xml
+            ) ?? $text
         );
         $convmap = array(0x0, 0x10000, 0, 0xfffff);
         return mb_decode_numericentity($text, $convmap, 'utf-8');
@@ -375,13 +383,13 @@ class Harusame
         $fileterReg = "`($urlRegFlagment|$mailRegFlagment|$charRefRegFlagment)`i";
 
         $text_array = preg_split($fileterReg, $text, 0, PREG_SPLIT_DELIM_CAPTURE);
-        if (!is_array($text_array)) {
+        if ($text_array === false) {
             return $text;
         }
 
         $return_text = "";
         foreach ($text_array as $text_array_item) {
-            if (preg_match($fileterReg, $text_array_item) == false) {
+            if (preg_match($fileterReg, $text_array_item) === 0) {
                 if (self::$tcyDigit >= 2) {
                     $text_array_item = self::setTcy($text_array_item);
                 }
