@@ -250,6 +250,14 @@ class Harusame
             return $text;
         }
 
+        $stripDefaultPrefix = true;
+        foreach ($dom->getElementsByTagName('*') as $element) {
+            if ($element->prefix === 'default' && $element->lookupNamespaceURI(null) !== $element->namespaceURI) {
+                $stripDefaultPrefix = false;
+                break;
+            }
+        }
+
         $text = rtrim(
             preg_replace(
                 '/^<html.*?>\n?|<\/html>$/',
@@ -257,6 +265,9 @@ class Harusame
                 $xml
             ) ?? $text
         );
+        if ($stripDefaultPrefix) {
+            $text = preg_replace('/(<\/?)default:/', '$1', $text) ?? $text;
+        }
         $convmap = array(0x0, 0x10000, 0, 0xfffff);
         return mb_decode_numericentity($text, $convmap, 'utf-8');
     }
@@ -292,7 +303,7 @@ class Harusame
 
         if ($node->nodeType === 1) { // 1はELEMENT_NODEを示します
             // check parent tagname to ignore
-            if (preg_match('/^(code|pre|math|svg)$/', $node->nodeName) === 1) { // nodeNameを使用
+            if (in_array($node->localName, ['code', 'pre', 'math', 'svg'], true)) { // nodeNameを使用
                 return true;
             }
 
